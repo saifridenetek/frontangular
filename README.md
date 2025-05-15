@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # patientdoctor
 
 lauch mock server :
@@ -16,3 +17,6 @@ todo Doctor Upcoming Appointments
 --------
 all the componenet are standalone 
 >>>>>>> 74c7270 (Premier commit - ajout de mon travail)
+=======
+# frontangular
+>>>>>>> d6d9eba3417e38800ef9156a11996d4d7064424c
