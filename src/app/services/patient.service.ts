@@ -17,7 +17,7 @@ export interface CreateAppointmentRequest {
   providedIn: 'root'
 })
 export class PatientService {
-  private apiUrl = 'http://localhost:3001/api';
+  private apiUrl = 'http://localhost:8901/api';
 
   constructor(private http: HttpClient) { }
 

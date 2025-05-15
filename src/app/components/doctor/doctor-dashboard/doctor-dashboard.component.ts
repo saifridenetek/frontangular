@@ -61,6 +61,6 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   logout(): void {
     // Handle logout logic (clear session, navigate to login)
     console.log('Doctor logged out');
-    this.router.navigate(['/login']);
+    this.router.navigate(['/signin']);
   }
 }

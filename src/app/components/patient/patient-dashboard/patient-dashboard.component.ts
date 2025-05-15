@@ -23,18 +23,27 @@ export class PatientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Récupérer le nom du patient depuis AuthService
-    this.patientName = this.authService.getUsername();
+  // First get the username from local storage
+  this.patientName = this.authService.getUsername();
+  
+  console.log('Patient name from auth:', this.patientName); // Debug log
 
-    // Charger les données du tableau de bord du patient
-    this.patientService.getPatientDashboard().subscribe(data => {
+  // Then load dashboard data
+  this.patientService.getPatientDashboard().subscribe({
+    next: (data) => {
       if (data) {
-        this.patientName = data.name || this.patientName; // Utiliser le nom retourné par l'API si disponible
-        this.upcomingAppointments = data.upcomingAppointments || []; // Assurez-vous que la liste est initialisée
+        // Use data.name if available, otherwise fall back to the username
+        this.patientName = data.name || this.patientName;
+        this.upcomingAppointments = data.upcomingAppointments || [];
+        
+        console.log('Dashboard data:', data); // Debug log
       }
-    });
-  }
-
+    },
+    error: (err) => {
+      console.error('Error loading dashboard:', err);
+    }
+  });
+}
   onBookAppointment(): void {
     this.router.navigate(['/patient/appointments/new']);
   }
@@ -47,6 +56,6 @@ export class PatientDashboardComponent implements OnInit {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     localStorage.removeItem('name'); // Supprime également le nom de l'utilisateur
-    this.router.navigate(['/login']);
+    this.router.navigate(['/signin']);
   }
 }

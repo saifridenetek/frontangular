@@ -27,24 +27,26 @@ export interface DoctorDashboard {
   providedIn: 'root'
 })
 export class DoctorService {
-  private apiUrl = 'http://localhost:3001/api';
+  private apiUrl = 'http://localhost:8901/api';
   private refreshDashboardSource = new Subject<void>();
   refreshDashboard$ = this.refreshDashboardSource.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  private getHeaders(): HttpHeaders {
-    const doctorEmail = localStorage.getItem('email');
-    return new HttpHeaders({
-      'x-doctor-email': doctorEmail || ''
-    });
-  }
+  // In doctor.service.ts
+private getHeaders(): HttpHeaders {
+  const token = localStorage.getItem('token');
+  return new HttpHeaders({
+    'x-doctor-email': localStorage.getItem('email') || '',
+    'Authorization': `Bearer ${token}`
+  });
+}
 
-  getDoctorDashboard(): Observable<DoctorDashboard> {
-    const doctorEmail = localStorage.getItem('email');
-    const headers = new HttpHeaders().set('x-doctor-email', doctorEmail || '');
-    return this.http.get<DoctorDashboard>(`${this.apiUrl}/doctor/dashboard`, { headers });
-  }
+getDoctorDashboard(): Observable<DoctorDashboard> {
+  return this.http.get<DoctorDashboard>(`${this.apiUrl}/doctor/dashboard`, {
+    headers: this.getHeaders()
+  });
+}
 
   getAppointments(): Observable<Appointment[]> {
     const doctorEmail = localStorage.getItem('email');

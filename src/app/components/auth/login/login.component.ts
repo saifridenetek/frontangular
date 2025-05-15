@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../core/auth.service';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms'; // Import ReactiveFormsModule
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, RouterModule],  // Make sure ReactiveFormsModule is here
+  imports: [ReactiveFormsModule, CommonModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -19,27 +17,39 @@ export class LoginComponent {
 
   constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required]], // Changed from email to username
       password: ['', Validators.required]
     });
   }
 
-  login(): void {
-    console.log('login:', this.loginForm.value);
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe(response => {
-        console.log('Login successful:', response);
-        localStorage.setItem('token', response.token);
-        localStorage.setItem('role', response.role);
-        if (response.role === 'PATIENT') {
-          this.router.navigate(['/patient/dashboard']);
-        } else {
-          // Redirect for other roles (if any)
-          this.router.navigate(['/doctor/dashboard']);
+  
+   // In login.component.ts
+login(): void {
+  if (this.loginForm.valid) {
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (response) => {
+        console.log('Login response:', response);
+        localStorage.setItem('token', response.accessToken);
+        localStorage.setItem('username', response.username);
+        
+        // Handle roles - make sure this matches your backend response
+        const role = response.roles?.[0] || response.role;
+        if (role) {
+          localStorage.setItem('role', role);
         }
-      }, error => {
+
+        // Navigate based on role - case insensitive comparison
+        if (role && role.toLowerCase() === 'doctor') {
+          this.router.navigate(['/doctor/dashboard']);
+        } else {
+          this.router.navigate(['/patient/dashboard']);
+        }
+      },
+      error: (error) => {
         console.error('Login failed:', error);
-      });
-    }
+        alert('Login failed. Please check your username and password.');
+      }
+    });
   }
+}
 }

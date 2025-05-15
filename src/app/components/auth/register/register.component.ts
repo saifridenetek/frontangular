@@ -23,32 +23,31 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      confirmPassword: ['', Validators.required], 
+      confirmPassword: ['', Validators.required],
       name: ['', Validators.required],
       role: ['PATIENT', Validators.required], // Default role to PATIENT
-    });
+    }, { validators: this.passwordMatchValidator });
   }
 
-   // Validateur personnalisé pour vérifier que les mots de passe correspondent
+  // Custom validator to check if passwords match
   passwordMatchValidator(form: FormGroup) {
-    return form.get('password')?.value === form.get('confirmPassword')?.value 
-      ? null 
+    return form.get('password')?.value === form.get('confirmPassword')?.value
+      ? null
       : { mismatch: true };
   }
 
-  register() {
-  if (this.registerForm.valid) {
+  signup() {
+    if (this.registerForm.valid) {
     if (this.registerForm.value.password !== this.registerForm.value.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
 
-    const { confirmPassword, ...userData } = this.registerForm.value;
-    
-    this.authService.register(userData).subscribe({
-      next: () => {
+    this.authService.signup(this.registerForm.value).subscribe({
+      next: (response) => {
+        console.log('Registration successful:', response);
         alert('Registration successful!');
-        this.router.navigate(['/login']);
+        this.router.navigate(['/signin']);
       },
       error: (error) => {
         console.error('Registration failed:', error);
